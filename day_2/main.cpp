@@ -6,16 +6,14 @@
 
 using namespace std;
 
-const int N_SAMPLES = 1;
+const int N_SAMPLES = 1000;
 const int MIN_DISTANCE = 1;
 const int MAX_DISTANCE = 3;
 
 void clean_memory(int **samples) {
   for (int i = 0; i < N_SAMPLES; i++) {
-    cout << "Deleting " << i << endl;
-    delete samples[i];
+    delete[] samples[i];
   }
-  cout<< "Deleting samples" << endl;
   delete samples;
 }
 
@@ -32,23 +30,19 @@ int *read_row(ifstream &file) {
   std::string line;
   getline(file, line);
 
- // std::istringstream iss(line);
-  //while (iss >> tmpRow[counter]) {
+  std::istringstream iss(line);
+  while (iss >> tmpRow[counter]) {
     counter++;
     assert(counter < MAX && "Error: Increase MAX");
-  //}
-
-  int *row = new int[7]{6, 10, 20, 30, 40, 50, 60};
-  return row;
-}
-
-int* get_row() {
-  int *row = new int[7]{6, 10, 20, 30, 40, 50, 60};
+  }
+  int *row = new int[counter + 1];
+  row[0] = counter;
+  memcpy(&row[1], tmpRow, counter * sizeof(int));
   return row;
 }
 
 void read_file(int **raports) {
-  ifstream file("./fail.txt");
+  ifstream file("./input.txt");
   if (!file.is_open()) {
     cout << "Unable to open file" << endl;
     return;
@@ -56,8 +50,6 @@ void read_file(int **raports) {
 
   for (int i = 0; i < N_SAMPLES; i++) {
     raports[i] = read_row(file);
-    //raports[i] = get_row();
-    //raports[i] = new int[7]{6, 10, 20, 30, 40, 50, 60};
   }
   file.close();
 }
@@ -109,7 +101,6 @@ void rm_value(int *row, int index, int *out) {
 
 int *drop_from(int *row, int index) {
   int *newRow = new int[row[0]];
-  cout<< "Created" << endl;
   rm_value(row, index, newRow);
   return newRow;
 }
@@ -127,13 +118,13 @@ void run_task_2(int **raports) {
 
       cout << j-1 << ": Trying for: ";
       print_line(raport, raport[0] + 1);
-      cout << "With success=" << isSafe << endl;
+      cout << "With success=" << isSafe << endl << endl;
       if (deleteFlag) {
-        cout << "Deleting" << endl<<endl;
+        cout << "Deleting" << endl;
         delete raport;
         deleteFlag = false;
       }
-      if (false && isSafe) {
+      if (isSafe) {
         safeCount++;
         break;
       }
@@ -161,13 +152,8 @@ void run_task_1(int **raports) {
 }
 
 int main() {
-  
-  cout<< "Created Samples" << endl;
   int **raports = new int *[N_SAMPLES];
 
-  //raports[0] = new int[7]{6, 10, 20, 30, 40, 50, 60};
-  //int *row = new int[7]{6, 10, 20, 30, 40, 50, 60};
-  //raports[0] = row;
   read_file(raports);
   // run_task_1(raports);
   run_task_2(raports);
@@ -178,7 +164,5 @@ int main() {
   //  print_line(newRaport, newRaport[0]+1);
 
   clean_memory(raports);
-
-
   return 0;
 }
