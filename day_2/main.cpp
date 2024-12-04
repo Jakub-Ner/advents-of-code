@@ -93,7 +93,6 @@ void rm_value(int *row, int index, int *out) {
   memcpy(&out[0], &row[0], (index + 1) * sizeof(int));
   out[0]--;
   if (index >= row[0]) {
-    cout << "Index out of bounds" << endl;
     return;
   }
   memcpy(&out[index], &row[index + 1], (row[0] - index) * sizeof(int));
@@ -116,11 +115,11 @@ void run_task_2(int **raports) {
     for (int j = 1; j <= raports[i][0] + 1; j++) {
       auto [isSafe, index] = check_conditions(raport);
 
-      cout << j-1 << ": Trying for: ";
-      print_line(raport, raport[0] + 1);
-      cout << "With success=" << isSafe << endl << endl;
+      //cout << j - 1 << ": Trying for: ";
+      //print_line(raport, raport[0] + 1);
+      //cout << "With success=" << isSafe << endl << endl;
       if (deleteFlag) {
-        cout << "Deleting" << endl;
+        //cout << "Deleting" << endl;
         delete raport;
         deleteFlag = false;
       }
@@ -155,14 +154,8 @@ int main() {
   int **raports = new int *[N_SAMPLES];
 
   read_file(raports);
-  // run_task_1(raports);
+  run_task_1(raports);
   run_task_2(raports);
-  //  int* raport = raports[0];
-  //  int newRaport[raport[0]];
-  //  rm_value(raport, 2, newRaport);
-  //  print_line(raport, raport[0]+1);
-  //  print_line(newRaport, newRaport[0]+1);
-
   clean_memory(raports);
   return 0;
 }
