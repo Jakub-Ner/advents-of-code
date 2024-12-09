@@ -9,7 +9,7 @@ cat $FILE | \
 
 echo -e "\nPart 2"
 elements=$(cat $FILE | tr -d '\n' | \
-  egrep -o "mul\([0-9]+,[0-9]+\)|do()|don't\(\)" | \
+  egrep -o "mul\([0-9]+,[0-9]+\)|do\(\)|don't\(\)" | \
   awk -F'[(,)]'  '{print $1, $2*$3}')
 
 skip=false
