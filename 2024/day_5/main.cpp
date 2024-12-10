@@ -18,7 +18,7 @@ void print_row(vector<int> row) {
 }
 
 int read_rules(ifstream &file, vector<int> *rules) {
-  int page_nr;
+  int pageNr;
   int successor;
   char c;
   int counter = 0;
@@ -30,20 +30,20 @@ int read_rules(ifstream &file, vector<int> *rules) {
       return counter;
     }
     istringstream iss(line);
-    iss >> page_nr >> c >> successor;
-    assert(page_nr < MAX_PAGE_NR && "Error: Increase MAX_PAGE_NR");
-    rules[page_nr].push_back(successor);
+    iss >> pageNr >> c >> successor;
+    assert(pageNr < MAX_PAGE_NR && "Error: Increase MAX_PAGE_NR");
+    rules[pageNr].push_back(successor);
   }
   return counter;
 }
 
 void read_updates(ifstream &file, vector<vector<int>> &updates) {
   char c;
-  int page_nr;
+  int pageNr;
   int idx = 0;
-  while (file >> page_nr) {
+  while (file >> pageNr) {
     file.get(c); // use get to capture '\n'
-    updates[idx].push_back(page_nr);
+    updates[idx].push_back(pageNr);
     if (c == '\n') {
       idx++;
     }
@@ -65,32 +65,64 @@ vector<vector<int>> read_file(string name, vector<int> *rules) {
   return updates;
 }
 
-bool is_any_visited_in_tabu(vector<int>& tabu, vector<int>& visited) {
+int find_invalid_page_id(vector<int>& tabu, vector<int>& visited) {
   for (int i= 0; i < visited.size(); i++) {
     if (find(tabu.begin(), tabu.end(), visited[i]) != tabu.end()) {
-      return true;
+      return i;
     }
   }
-  return false;
+  return -1;
 }
 
-bool is_ordering_correct(vector<int> *rules, vector<int> &updateRow) {
+struct InvalidPage {
+  int pageNr;
+  int successor;
+};
+
+InvalidPage find_invalid_ordering(vector<int> *rules, vector<int> &updateRow) {
   vector<int> visited = {updateRow[0]};
   for (int i = 1; i < updateRow.size(); i++) {
     vector<int> tabu = rules[updateRow[i]];
-    if (is_any_visited_in_tabu(tabu, visited)) {
-      return false;
+    int idx = find_invalid_page_id(tabu, visited);
+    if (idx != -1) {
+      return InvalidPage{idx, i};
     } 
     visited.push_back(updateRow[i]);
   }
-  return true;
+  return InvalidPage{-1, -1};
+}
+
+void swap(int &a, int &b) {
+  int tmp = a;
+  a = b;
+  b = tmp;
+}
+
+void run_task_2(vector<int> *rules, vector<vector<int>> &updates) {
+  cout << "Task 2" << endl;
+  int sumOfMiddles = 0;
+  for (int i = 0; i < updates.size(); i++) {
+    InvalidPage invalid = find_invalid_ordering(rules, updates[i]);
+    if (invalid.pageNr != -1) {
+
+      while (invalid.pageNr != -1){
+        // cout << "Incorrect ordering: Should be page=" << updates[i][invalid.successor] << " successor=" << updates[i][invalid.pageNr] << endl;
+        swap(updates[i][invalid.pageNr], updates[i][invalid.successor]);
+        invalid = find_invalid_ordering(rules, updates[i]);
+      }
+
+      sumOfMiddles += updates[i][updates[i].size() / 2];
+      // print_row(updates[i]);
+    }
+  }
+  cout << "Sum of middle elements: " << sumOfMiddles << endl << endl;
 }
 
 void run_task_1(vector<int> *rules, vector<vector<int>> &updates) {
   cout << "Task 1" << endl;
   int sumOfMiddles = 0;
   for (int i = 0; i < updates.size(); i++) {
-    if (is_ordering_correct(rules, updates[i])) {
+    if (find_invalid_ordering(rules, updates[i]).pageNr == -1) {
       sumOfMiddles += updates[i][updates[i].size() / 2];
     }
   }
@@ -102,7 +134,7 @@ int main() {
   vector<vector<int>> updates = read_file("./input.txt", rules);
 
   run_task_1(rules, updates);
-  
+  run_task_2(rules, updates); 
   delete[] rules;
   return 0;
 }
