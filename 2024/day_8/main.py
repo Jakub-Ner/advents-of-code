@@ -1,3 +1,5 @@
+from typing import Callable
+
 import numpy as np
 
 HEIGHT = 50
@@ -25,8 +27,9 @@ class Point:
   def __add__(self, other):
     return Point(self.x + other.x, self.y + other.y)
 
+
 def load_data():
-  board = np.genfromtxt("input.txt", delimiter=1, dtype=str, comments=None)  # noqa
+  board = np.genfromtxt("input.txt", delimiter=1, dtype=str, comments=None)  # type: ignore
   print("Board Shape:", board.shape)
 
   values = np.unique(board)
@@ -41,24 +44,60 @@ def load_data():
   return board, antindes
 
 
-def find_antinode(p_1: Point, p_2: Point) -> Point|None:
-  antinode = p_1 +p_1 - p_2
+def single_reflection(p_1: Point, p_2: Point) -> list[Point]:
+  antinode = p_1 + p_1 - p_2
 
   if antinode.x < 0 or antinode.y < 0 or antinode.x >= WIDTH or antinode.y >= HEIGHT:
-    return None
-  return antinode
+    return []
+  return [antinode]
+
+
+def find_antinodes(
+  antenas: dict[str, list[Point]], strategy: Callable[[Point, Point], list[Point]]
+) -> set[Point]:
+  antinodes: set[Point] = set()
+  for antena_name, points in antenas.items():  # type: ignore
+    for point in points:
+      for other_point in points:
+        if point == other_point:
+          continue
+
+        antinode = strategy(point, other_point)
+        if len(antinode) > 0:
+          antinodes |= set(antinode)
+  return antinodes
+
+
+def run_task_1():
+  antinodes = find_antinodes(antenas, single_reflection)
+  print("Task 1 - Num of unique antinodes:", len(antinodes))
+
+
+def propageted_reflection(p_1: Point, p_2: Point) -> list[Point]:
+  antinodes = [p_1]
+
+  while new_antinode := single_reflection(p_1, p_2):
+    antinodes.extend(new_antinode)
+    p_2 = p_1
+    p_1 = new_antinode[0]
+
+  return antinodes
+
+
+def draw_board(board, antinodes):
+  board = board.copy()
+  for antinode in antinodes:
+    board[antinode.y, antinode.x] = "#"
+  print(board)
+
+
+def run_task_2():
+  antinodes = find_antinodes(antenas, propageted_reflection)
+  print("\nTask 2 - Num of unique antinodes:", len(antinodes))
+  # draw_board(board, antinodes)
+
 
 board, antenas = load_data()
 
-antinodes: set[Point] = set() 
-for antena_name, points in antenas.items():
-  for point in points:
-    for other_point in points:
-      if point != other_point:
-        antinode = find_antinode( point, other_point)
-        if antinode:
-          antinodes.add(antinode)
-
-print("Task 1 - Num of unique antinodes:", len(antinodes))
-
-
+# run_task_1()
+run_task_2()
