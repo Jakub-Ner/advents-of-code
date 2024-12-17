@@ -4,7 +4,7 @@ import numpy as np
 
 HEIGHT = 50
 WIDTH = HEIGHT
-EMPTY_FIELD = "."
+EMPTY_FIELD = '.'
 
 
 class Point:
@@ -19,7 +19,7 @@ class Point:
     return self.x == other.x and self.y == other.y
 
   def __repr__(self):
-    return f"Point({self.x}, {self.y})"
+    return f'Point({self.x}, {self.y})'
 
   def __sub__(self, other):
     return Point(self.x - other.x, self.y - other.y)
@@ -29,8 +29,8 @@ class Point:
 
 
 def load_data():
-  board = np.genfromtxt("input.txt", delimiter=1, dtype=str, comments=None)  # type: ignore
-  print("Board Shape:", board.shape)
+  board = np.genfromtxt('input.txt', delimiter=1, dtype=str, comments=None)  # type: ignore
+  print('Board Shape:', board.shape)
 
   values = np.unique(board)
   values = values[values != EMPTY_FIELD]
@@ -70,7 +70,7 @@ def find_antinodes(
 
 def run_task_1():
   antinodes = find_antinodes(antenas, single_reflection)
-  print("Task 1 - Num of unique antinodes:", len(antinodes))
+  print('Task 1 - Num of unique antinodes:', len(antinodes))
 
 
 def propageted_reflection(p_1: Point, p_2: Point) -> list[Point]:
@@ -87,13 +87,13 @@ def propageted_reflection(p_1: Point, p_2: Point) -> list[Point]:
 def draw_board(board, antinodes):
   board = board.copy()
   for antinode in antinodes:
-    board[antinode.y, antinode.x] = "#"
+    board[antinode.y, antinode.x] = '#'
   print(board)
 
 
 def run_task_2():
   antinodes = find_antinodes(antenas, propageted_reflection)
-  print("\nTask 2 - Num of unique antinodes:", len(antinodes))
+  print('\nTask 2 - Num of unique antinodes:', len(antinodes))
   # draw_board(board, antinodes)
 
 

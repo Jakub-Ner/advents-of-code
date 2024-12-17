@@ -42,6 +42,7 @@ Equations read_file(const char *filename) {
   for (int i = 0; i < LINES_NUM; i++) {
     file >> equations[i];
   }
+  file.close();
   return equations;
 }
 

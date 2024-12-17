@@ -31,6 +31,7 @@ void read_file(char **matrix, string name) {
       file >> matrix[i][j];
     }
   }
+  file.close();
 }
 
 void clear_memory(char **matrix) {
