@@ -92,7 +92,7 @@ local function goUpHill(position, visited)
   end
 end
 
-local function runTask1()
+local function runTask(calculateScore)
   loadBoard("input.txt")
   if not Board then
     print("Error loading board")
@@ -106,15 +106,19 @@ local function runTask1()
         -- print("\n" .. BOLD .. "x", "y", "height" .. RESET)
         local visited = {}
         goUpHill({ x = x, y = y, height = height }, visited)
-        local newScores = SizeOf(Set(visited))
-        print("New scores: ", newScores)
+        local newScores = calculateScore(visited)
         trailheadScore = trailheadScore + newScores
       end
     end
   end
-  print("\nTrailhead score: ", trailheadScore)
+  print("Trailhead score: ", trailheadScore)
 end
 
 Board = {}
-runTask1()
+
+print("Task 1:")
+runTask(function(arr) return SizeOf(Set(arr)) end)
+
+print("\nTask 2:")
+runTask(function(arr) return SizeOf(arr) end)
 
