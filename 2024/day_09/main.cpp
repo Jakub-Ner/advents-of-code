@@ -80,8 +80,6 @@ void naively_defragment_disk(vector<int> &disk) {
 
     swap(disk[left], disk[right]);
   }
-  // cout << "\nDefragmented disk: " << endl;
-  // print(disk);
 }
 
 struct Fragment {
